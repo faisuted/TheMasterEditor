@@ -1,0 +1,5 @@
+{
+  "name": "The Master Editor - Ultimate All-in-One Utility",
+  "description": "A comprehensive suite of 40+ client-side tools for images, PDFs, media, calculations, and developer tasks. 100% private, secure, and browser-based.",
+  "requestFramePermissions": ["microphone"]
+}
