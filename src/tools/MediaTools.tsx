@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ToolWrapper } from '../components/ToolWrapper';
 import { Play, Pause, Volume2, Mic, MicOff, Type, Download, Music } from 'lucide-react';
+import { GoogleGenAI, Modality } from "@google/genai";
 
 export const TextToSpeech: React.FC = () => {
   const [text, setText] = useState('');
@@ -38,24 +39,49 @@ export const TextToSpeech: React.FC = () => {
     if (!text) return;
     setIsDownloading(true);
     try {
-      // Using Google Translate TTS API for download functionality
-      // This is a common "free" way to get TTS audio as a file client-side
-      const lang = voice?.lang.split('-')[0] || 'en';
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text.slice(0, 200))}&tl=${lang}&client=tw-ob`;
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
       
-      const response = await fetch(url);
-      const blob = await response.blob();
+      // Using Gemini 2.5 Flash TTS for high-quality, secure downloads
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-preview-tts",
+        contents: [{ parts: [{ text: text.slice(0, 2000) }] }], // Increased limit to 2000 chars
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: {
+            voiceConfig: {
+              // Using 'Zephyr' as a high-quality default for downloads
+              prebuiltVoiceConfig: { voiceName: 'Zephyr' },
+            },
+          },
+        },
+      });
+
+      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      
+      if (!base64Audio) {
+        throw new Error("No audio data received from API");
+      }
+
+      // Convert base64 to blob
+      const byteCharacters = atob(base64Audio);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'audio/mp3' });
+
       const downloadUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `tts-audio-${lang}.mp3`;
+      link.download = `master-editor-speech.mp3`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Download failed", error);
-      alert("Download failed. This may be due to browser security restrictions or text length (max 200 chars for download).");
+      alert("Download failed. Please ensure you have a stable internet connection. The high-quality download service might be temporarily unavailable.");
     } finally {
       setIsDownloading(false);
     }
@@ -206,8 +232,8 @@ export const TextToSpeech: React.FC = () => {
             </button>
           </div>
         </div>
-        {text.length > 200 && (
-          <p className="text-[10px] text-slate-400 italic">Note: Downloads are limited to the first 200 characters.</p>
+        {text.length > 2000 && (
+          <p className="text-[10px] text-slate-400 italic">Note: Downloads are limited to the first 2000 characters.</p>
         )}
       </div>
     </ToolWrapper>

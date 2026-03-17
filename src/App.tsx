@@ -196,7 +196,7 @@ export default function App() {
           <div className="p-4 border-t border-slate-100 bg-slate-50/50">
             <AdSlot className="mb-4" />
             <div className="flex items-center justify-between text-slate-400">
-              <a href="https://github.com/faisuted" className="hover:text-slate-600 transition-colors"><Github className="w-5 h-5" /></a>
+              <a href="https://github.com" className="hover:text-slate-600 transition-colors"><Github className="w-5 h-5" /></a>
               <a href="#info" className="hover:text-slate-600 transition-colors"><Info className="w-5 h-5" /></a>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -389,7 +389,7 @@ export default function App() {
             <div className="flex items-center gap-6">
               <a href="#" className="hover:text-slate-600 transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-slate-600 transition-colors">Terms of Service</a>
-              <a href="https://github.com/faisuted" className="flex items-center gap-1 hover:text-slate-600 transition-colors">
+              <a href="https://github.com" className="flex items-center gap-1 hover:text-slate-600 transition-colors">
                 <Github className="w-4 h-4" /> GitHub
               </a>
             </div>
